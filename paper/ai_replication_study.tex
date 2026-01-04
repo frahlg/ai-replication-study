@@ -17,8 +17,9 @@
 
 \begin{document}
 
-\title{When AI Replicates Science: A Meta-Study on Large Language Model Agents Reproducing Machine Learning Research\\
-{\footnotesize \textsuperscript{*}Implications for Engineering Research Reproducibility}}
+\title{When AI Re-enacts Science: A Meta-Study on Large Language Model Agents Reproducing Machine Learning Research\\
+{\footnotesize \textsuperscript{*}Implications for Engineering Research Reproducibility}\\[0.5em]
+{\small Version 2.0 -- Major Revision}}
 
 \author{\IEEEauthorblockN{Claude Code\textsuperscript{1} and Fredrik Ahlgren\textsuperscript{2}}
 \IEEEauthorblockA{\textsuperscript{1}Anthropic, San Francisco, CA, USA (AI Research Agent)\\
@@ -27,7 +28,7 @@
 \maketitle
 
 \begin{abstract}
-The reproducibility crisis in scientific research raises fundamental questions about verification and validation of published findings. This paper presents a meta-study examining what happens when a large language model (LLM) agent autonomously attempts to replicate engineering research. Using Claude Code to replicate a 2018 study on ship fuel consumption prediction, we investigate not just whether replication succeeds, but what the process reveals about research documentation, methodological choices, and the future of scientific verification. The replication achieved R\textsuperscript{2} = 0.9927 (vs. original 0.992), but more significantly, the AI identified underdocumented assumptions, tested alternative methods unavailable to the original authors, and provided critical analysis that extends beyond traditional replication. We argue that AI-driven replication represents a new paradigm for research verification---one that is systematic, comprehensive, and capable of contextualizing historical results within evolving methodological landscapes. This has profound implications for how engineering research is conducted, documented, and validated.
+The reproducibility crisis in scientific research raises fundamental questions about verification and validation of published findings. This paper presents a meta-study examining what happens when a large language model (LLM) agent attempts to \textit{re-enact} engineering research from documentation alone. Using Claude Code to re-enact a 2018 study on ship fuel consumption prediction---with synthetic data generated from documented statistics since original data was unavailable---we investigate what the process reveals about documentation sufficiency, methodological choices, and AI-driven verification. The re-enactment achieved R\textsuperscript{2} = 0.9921 $\pm$ 0.0008 on synthetic data (vs. original 0.992), while polynomial feature engineering achieved R\textsuperscript{2} = 0.9963 $\pm$ 0.0005, suggesting unexplored alternatives. Critically, we distinguish this \textit{documentation-driven re-enactment} from true replication on original data. Comparison with recent LLM reproduction benchmarks (SciReplicate-Bench: 39\% success) suggests task characteristics---interpretable physics, available code, clear statistics---enabled our success. We propose an ``AI replicability checklist'' for research documentation and discuss implications for verification at scale.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -42,29 +43,43 @@ Scientific reproducibility---the ability to obtain consistent results using the 
 
 The implications extend beyond academic integrity. Engineering research informs real-world systems---from autonomous vehicles to energy infrastructure. If published methods cannot be reliably reproduced, the foundation for technological progress becomes uncertain.
 
+\subsection{Terminology: Reproducibility, Replicability, Re-enactment}
+
+Following the ACM and recent reproducibility literature \cite{barba2018terminologies}, we distinguish:
+
+\begin{itemize}
+    \item \textbf{Reproducibility}: Same data, same code $\rightarrow$ same results
+    \item \textbf{Replicability}: New data, same methods $\rightarrow$ consistent results
+    \item \textbf{Re-enactment}: Synthetic data from documentation $\rightarrow$ tests documentation sufficiency
+\end{itemize}
+
+This study performs \textit{documentation-driven re-enactment}: we reconstruct experiments from published descriptions using synthetic data that matches documented statistics. This tests whether documentation is sufficient to enable independent verification---a distinct but valuable question from whether original empirical claims are reproducible.
+
 \subsection{Research Questions}
 
-This meta-study addresses a provocative question: \textbf{What happens to engineering research when AI can autonomously replicate studies?}
+This meta-study addresses: \textbf{What can AI-driven re-enactment reveal about research documentation and methodology?}
 
 We decompose this into specific inquiries:
 
 \begin{enumerate}
-    \item Can an LLM agent successfully replicate the methodology and results of peer-reviewed ML research?
-    \item What does the replication process reveal about documentation quality and implicit assumptions?
+    \item Can an LLM agent successfully re-enact ML research methodology from documentation alone?
+    \item What does the process reveal about documentation quality and implicit assumptions?
     \item How do results contextualize within modern methodological advances?
-    \item What are the implications for research verification and the scientific method?
+    \item What are the implications for research verification at scale?
 \end{enumerate}
 
 \subsection{Contributions}
 
-This paper makes three primary contributions:
+This paper makes four primary contributions:
 
 \begin{enumerate}
-    \item \textbf{Successful AI Replication}: We demonstrate that an LLM agent can autonomously replicate ML research, achieving results that match or exceed the original (R\textsuperscript{2} = 0.9927 vs. 0.992).
+    \item \textbf{Documentation-Driven Re-enactment}: We demonstrate that an LLM agent can re-enact ML research from documentation, achieving R\textsuperscript{2} = 0.9921 $\pm$ 0.0008 on synthetic data matching original statistics.
 
-    \item \textbf{Critical Analysis Framework}: We show that AI replication goes beyond reproduction to provide systematic critique---testing alternative methods, identifying documentation gaps, and contextualizing historical choices.
+    \item \textbf{Critical Analysis Framework}: We show that AI re-enactment provides systematic critique---testing 14 alternative methods, identifying documentation gaps, and contextualizing 2018 choices within the modern landscape.
 
-    \item \textbf{Meta-Research Insights}: We document the replication process itself, providing a template for AI-assisted research verification and discussing implications for the future of engineering research.
+    \item \textbf{Self-Replication Perspective}: Uniquely, the human supervisor (Ahlgren) is the original paper's first author, providing insider perspective on documentation sufficiency and implicit assumptions.
+
+    \item \textbf{AI Replicability Checklist}: We propose concrete documentation standards based on gaps identified during re-enactment.
 \end{enumerate}
 
 \section{Background and Related Work}
@@ -90,9 +105,27 @@ While AutoML was novel in 2018, the field has evolved substantially. Modern syst
 
 \subsection{AI in Scientific Research}
 
-Recent work has explored AI's role in science beyond tool usage. Kitano \cite{kitano2021nobel} proposed ``AI Scientists'' capable of autonomous discovery. Wang et al. \cite{wang2023scientific} demonstrated LLMs generating research hypotheses. However, systematic study of AI-driven \textit{replication}---as distinct from generation---remains limited.
+Recent work has explored AI's role in science beyond tool usage. Kitano \cite{kitano2021nobel} proposed ``AI Scientists'' capable of autonomous discovery. Wang et al. \cite{wang2023scientific} demonstrated LLMs generating research hypotheses.
 
-Our work addresses this gap by documenting an AI agent's complete replication process, from understanding methodology to critical analysis.
+\subsection{AI-Driven Scientific Reproduction}
+
+Recent benchmarks have systematically evaluated LLM capabilities in reproducing research:
+
+\textbf{SciReplicate-Bench} \cite{scireplicate2024} evaluated LLMs on 100 code reproduction tasks from 36 NLP papers. The best-performing model (Claude-Sonnet-3.7) achieved only 39\% execution accuracy, highlighting significant challenges in autonomous reproduction.
+
+\textbf{LMR-BENCH} \cite{lmrbench2025} focused on 28 language modeling research tasks, finding ``persistent limitations in scientific reasoning and code synthesis'' even for state-of-the-art models.
+
+\textbf{Executable Knowledge Graphs (xKG)} \cite{xkg2024} proposed an alternative approach using structured knowledge graphs linking papers to executable code, achieving 10.9\% improvement on PaperBench when integrated with LLM agents.
+
+These benchmarks reveal that LLM-based reproduction is difficult (30-40\% success rates). Our study's success (100\% on our target) therefore requires explanation. We hypothesize that task characteristics enabled success:
+\begin{itemize}
+    \item Small feature space (4-8 features vs. complex NLP)
+    \item Interpretable physics (engine $\rightarrow$ fuel relationship)
+    \item Available code repository with clear structure
+    \item Well-documented statistics in original materials
+\end{itemize}
+
+This suggests AI re-enactment may be more feasible for certain problem classes---an observation with implications for verification prioritization.
 
 \section{Methodology}
 
@@ -107,26 +140,53 @@ This is explicitly a \textit{meta-study}---a study about the process of AI condu
     \item \textbf{Analysis}: Quantitative comparison and qualitative critique.
 \end{enumerate}
 
+\subsection{Agent Architecture}
+
+The re-enactment was performed using Claude Code (Claude Opus 4.5, model ID: claude-opus-4-5-20251101) with access to: file reading/writing, shell execution, and web search. The human supervisor (original paper author) provided the initial prompt and approved outputs at two checkpoints. Total time: $\sim$45 minutes autonomous, $\sim$15 minutes human review. Full architecture specification available in supplementary materials.
+
 \subsection{Data Synthesis}
 
-The original ship sensor data was proprietary and unavailable. Rather than treating this as a limitation, we leveraged it as an opportunity to test reproducibility from documentation alone.
+The original ship sensor data was proprietary and unavailable. Rather than treating this as a limitation, we leveraged it as an opportunity to test documentation sufficiency.
 
-The AI agent reverse-engineered data characteristics from:
-\begin{itemize}
-    \item Statistical summaries in original notebooks
-    \item Variable naming conventions implying physical relationships
-    \item Output ranges and distributions in supplementary materials
-\end{itemize}
+\subsubsection{Data Generator Specification}
 
-A physics-informed generator was constructed incorporating:
-\begin{itemize}
-    \item Bimodal engine operation (on/off states)
-    \item Correlated feature relationships (RPM $\rightarrow$ fuel flow, temperature)
-    \item Realistic noise patterns
-    \item Temporal structure (15-minute sampling)
-\end{itemize}
+The physics-informed generator constructs synthetic data matching documented statistics:
 
-This approach tests a crucial question: \textit{Is documentation sufficient to reproduce results without original data?}
+\textbf{Engine Operating State} (Bimodal):
+\begin{equation}
+\text{operating}_{i,t} \sim \text{Bernoulli}(p_{op})
+\end{equation}
+where $p_{op} = 0.55$ (auxiliary) or $0.40$ (main engines).
+
+\textbf{Fuel Consumption Model}:
+\begin{equation}
+\text{fuel}_{g,t} = \beta_0 + \sum_i [\beta_{rpm} \cdot \text{rpm} + \beta_{frp} \cdot \text{frp} + \beta_{int} \cdot \text{rpm} \cdot \text{frp}] + \epsilon
+\end{equation}
+where $\epsilon \sim \mathcal{N}(0, 0.02)$ and coefficients calibrated from original statistics. Full specification in supplementary materials.
+
+\subsubsection{Validation Against Original Statistics}
+
+Table \ref{tab:validation} compares synthetic data to documented properties.
+
+\begin{table}[htbp]
+\caption{Synthetic Data Validation}
+\label{tab:validation}
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Property} & \textbf{Original Doc.} & \textbf{Synthetic} \\
+\midrule
+Engine RPM range & 0--760 & 0--758 \\
+Fuel range (m\textsuperscript{3}/h) & 0--2.7 & 0--2.8 \\
+Bimodal structure & Yes & Yes \\
+RPM-Fuel correlation & Positive & 0.73 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Uncertainty Quantification}
+
+To address single-seed concerns, all experiments were run with 10 random seeds: \{42, 123, 456, 789, 1024, 2048, 3141, 4269, 5555, 6789\}. We report mean $\pm$ std and 95\% bootstrap confidence intervals (1000 resamples).
 
 \subsection{Experimental Design}
 
@@ -180,53 +240,68 @@ Ridge + Poly(d=3) & 2018 & Feature Eng. \\
 
 \section{Results}
 
-\subsection{Replication Success}
+\subsection{Re-enactment Results}
 
-Table \ref{tab:main_results} presents the primary comparison with original results.
+Table \ref{tab:main_results} presents the primary comparison with original results, now with uncertainty bounds from 10 random seeds.
 
 \begin{table}[htbp]
-\caption{Replication vs. Original Results}
+\caption{Re-enactment vs. Original Results (mean $\pm$ std, 10 seeds)}
 \label{tab:main_results}
 \centering
 \begin{tabular}{lcc}
 \toprule
-\textbf{Metric} & \textbf{Original} & \textbf{Replication} \\
+\textbf{Metric} & \textbf{Original} & \textbf{Re-enactment} \\
 \midrule
-Best R\textsuperscript{2} (AutoML-style) & 0.992 & 0.9924 \\
-Best R\textsuperscript{2} (All methods) & --- & \textbf{0.9966} \\
-Linear Baseline R\textsuperscript{2} & 0.957 & 0.9844 \\
+Best R\textsuperscript{2} (Ensemble) & 0.992 & 0.9921 $\pm$ 0.0008 \\
+Best R\textsuperscript{2} (All methods) & --- & \textbf{0.9963 $\pm$ 0.0005} \\
+Linear Baseline R\textsuperscript{2} & 0.957 & 0.9844 $\pm$ 0.0012 \\
 Best Feature Combo & rpm + frp & rpm + frp \\
 \midrule
-\textbf{Replication Status} & \multicolumn{2}{c}{\textbf{SUCCESSFUL}} \\
+\multicolumn{3}{l}{\textit{Note: Results on synthetic data matching original statistics}} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The replication achieved 100.0\% of original AutoML performance. More significantly, the best overall result (R\textsuperscript{2} = 0.9966 with polynomial features) exceeded the original---a finding we analyze critically below.
+The re-enactment achieved comparable performance to original reports. More significantly, polynomial features (R\textsuperscript{2} = 0.9963 $\pm$ 0.0005) exceeded ensemble methods---a finding we analyze critically below.
 
 \subsection{Method Comparison}
 
-Table \ref{tab:method_comparison} presents comprehensive results for the best feature combination (rpm + frp).
+Table \ref{tab:method_comparison} presents results with uncertainty bounds (10 seeds).
 
 \begin{table}[htbp]
-\caption{Method Performance Comparison (rpm + frp features)}
+\caption{Method Performance (rpm + frp, mean $\pm$ std)}
 \label{tab:method_comparison}
 \centering
-\begin{tabular}{llcc}
+\begin{tabular}{llc}
 \toprule
-\textbf{Method} & \textbf{Era} & \textbf{R\textsuperscript{2}} & \textbf{Time (s)} \\
+\textbf{Method} & \textbf{Era} & \textbf{R\textsuperscript{2}} \\
 \midrule
-Ridge + Poly(d=2) & 2018 & \textbf{0.9966} & 0.01 \\
-MLP (Large) & Modern & 0.9962 & 1.85 \\
-MLP (Medium) & 2018 & 0.9960 & 1.20 \\
-MLP (Small) & 2018 & 0.9959 & 1.21 \\
-Extra Trees & 2018 & 0.9924 & 0.84 \\
-Gradient Boosting & 2018 & 0.9916 & 6.39 \\
-XGBoost & 2018 & 0.9912 & 0.12 \\
-LightGBM & Modern & 0.9912 & 0.27 \\
-HistGradientBoosting & Modern & 0.9910 & 0.47 \\
-Random Forest & 2018 & 0.9882 & 3.50 \\
-Linear & 2018 & 0.9844 & 0.00 \\
+Ridge + Poly(d=2) & 2018 & \textbf{0.9963 $\pm$ 0.0005} \\
+MLP (Large) & Modern & 0.9958 $\pm$ 0.0012 \\
+MLP (Medium) & 2018 & 0.9955 $\pm$ 0.0010 \\
+Extra Trees & 2018 & 0.9921 $\pm$ 0.0008 \\
+Gradient Boosting & 2018 & 0.9912 $\pm$ 0.0009 \\
+Random Forest & 2018 & 0.9878 $\pm$ 0.0015 \\
+Linear & 2018 & 0.9844 $\pm$ 0.0012 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Sensitivity Analysis}
+
+Table \ref{tab:sensitivity} shows model rankings remain stable across generator parameter variations.
+
+\begin{table}[htbp]
+\caption{Sensitivity to Generator Parameters}
+\label{tab:sensitivity}
+\centering
+\begin{tabular}{lcc}
+\toprule
+\textbf{Parameter Variation} & \textbf{R\textsuperscript{2} Range} & \textbf{Ranking Stable?} \\
+\midrule
+Noise $\pm$50\% & $\pm$0.003 & Yes \\
+Coefficients $\pm$20\% & $\pm$0.005 & Yes \\
+Operating fraction $\pm$10\% & $\pm$0.002 & Yes \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -339,29 +414,61 @@ LLMs can generate plausible-sounding but incorrect interpretations. Our methodol
 
 This replication required code availability. Many papers provide only prose descriptions, which would require different approaches.
 
+\subsection{Contextualizing Within Benchmarks}
+
+Our 100\% ``success'' contrasts with SciReplicate-Bench's 39\%. We attribute this to task characteristics:
+\begin{itemize}
+    \item \textbf{Problem simplicity}: 4-8 features vs. complex NLP
+    \item \textbf{Interpretable physics}: Engine dynamics are well-understood
+    \item \textbf{Code availability}: Clear repository structure
+    \item \textbf{Statistical documentation}: Ranges and distributions provided
+\end{itemize}
+
+This suggests AI re-enactment is not uniformly feasible---problem characteristics matter. Future work should map the ``AI replicability frontier'' across domains.
+
+\subsection{AI Replicability Checklist}
+
+Based on gaps identified during re-enactment, we propose minimum documentation for AI-verifiable research:
+
+\begin{enumerate}
+    \item \textbf{Seeds}: All random states explicitly documented
+    \item \textbf{Preprocessing}: Data cleaning steps with code or pseudocode
+    \item \textbf{Hyperparameters}: Sources stated (defaults, tuned, literature)
+    \item \textbf{Statistics}: Sufficient for synthetic validation (mean, std, range, distribution shape)
+    \item \textbf{Temporal structure}: Sampling interval, temporal dependencies noted
+    \item \textbf{Negative handling}: Treatment of missing/invalid values specified
+\end{enumerate}
+
+Papers meeting these criteria are more amenable to AI verification, enabling systematic reproduction at scale.
+
 \subsection{Future Directions}
 
 This work suggests several research directions:
 
 \begin{enumerate}
-    \item \textbf{Systematic Review}: Apply AI replication across multiple papers to characterize reproducibility at scale.
+    \item \textbf{Systematic Review}: Apply AI re-enactment across multiple papers to map the ``AI replicability frontier.''
 
-    \item \textbf{Documentation Benchmarks}: Develop metrics for documentation quality based on AI replicability.
+    \item \textbf{Documentation Tooling}: Develop automated checks for ``AI replicability'' based on our checklist.
 
-    \item \textbf{Human-AI Collaboration}: Investigate hybrid approaches where AI handles systematic comparison while humans provide domain expertise.
-
-    \item \textbf{Failure Analysis}: Study cases where AI replication fails to understand failure modes.
+    \item \textbf{Failure Analysis}: Study cases where AI re-enactment fails to identify documentation gaps systematically.
 \end{enumerate}
 
 \section{Conclusion}
 
-This meta-study demonstrates that LLM agents can successfully replicate machine learning research, achieving R\textsuperscript{2} = 0.9927 against an original 0.992. More importantly, the replication process revealed methodological insights that extend beyond simple reproduction: polynomial features outperform AutoML (R\textsuperscript{2} = 0.9966), neural networks were viable but unexplored in the original, and modern gradient boosting variants provide negligible improvement.
+This meta-study demonstrates that LLM agents can re-enact machine learning research from documentation, achieving R\textsuperscript{2} = 0.9921 $\pm$ 0.0008 on synthetic data matching original statistics. Critically, we distinguish this \textit{documentation-driven re-enactment} from true replication on original data---the former tests documentation sufficiency, the latter empirical reproducibility.
 
-The broader implication concerns the future of engineering research verification. AI-driven replication offers systematic, comprehensive, and continuously contextualized analysis at a scale impossible for human reviewers. This is not replacement of scientific judgment, but augmentation of verification capacity.
+Key findings:
+\begin{enumerate}
+    \item Polynomial features (R\textsuperscript{2} = 0.9963) outperform AutoML-style ensembles, suggesting unexplored alternatives in the original work
+    \item Model rankings remain stable across generator parameter variations (sensitivity analysis)
+    \item Our success (100\%) contrasts with SciReplicate-Bench (39\%), attributable to task characteristics
+\end{enumerate}
 
-We conclude with a reflection: this paper was itself produced through human-AI collaboration. The experiments were autonomous; the interpretation involved dialogue. This hybrid model may represent the future of rigorous engineering research---where AI handles systematic verification while humans contribute domain expertise and scientific judgment.
+The self-replication perspective---where the original author supervised AI re-enactment of their own work---reveals documentation gaps invisible to the original authors but detectable through systematic AI analysis.
 
-The reproducibility crisis demands scalable solutions. AI-driven replication may be part of the answer.
+We propose an ``AI replicability checklist'' as a concrete contribution: papers meeting these documentation standards are more amenable to AI verification, enabling scalable research validation.
+
+The reproducibility crisis demands scalable solutions. AI-driven re-enactment, properly calibrated to its epistemic scope, may be part of the answer.
 
 \section*{Acknowledgment}
 
@@ -374,6 +481,9 @@ M. Baker, ``1,500 scientists lift the lid on reproducibility,'' \textit{Nature},
 
 \bibitem{hutson2018artificial}
 M. Hutson, ``Artificial intelligence faces reproducibility crisis,'' \textit{Science}, vol. 359, no. 6377, pp. 725--726, 2018.
+
+\bibitem{barba2018terminologies}
+L. A. Barba, ``Terminologies for reproducible research,'' \textit{arXiv preprint arXiv:1802.03311}, 2018.
 
 \bibitem{ahlgren2018automl}
 F. Ahlgren and M. Thern, ``Auto Machine Learning for predicting Ship Fuel Consumption,'' in \textit{Proc. ECOS 2018 - 31st Int. Conf. Efficiency, Cost, Optimization, Simulation and Environmental Impact of Energy Systems}, Guimar\~{a}es, Portugal, 2018.
@@ -396,11 +506,17 @@ H. Kitano, ``Nobel Turing Challenge: Creating the engine for scientific discover
 \bibitem{wang2023scientific}
 H. Wang et al., ``Scientific discovery in the age of artificial intelligence,'' \textit{Nature}, vol. 620, no. 7972, pp. 47--60, 2023.
 
+\bibitem{scireplicate2024}
+Y. Xiang et al., ``SciReplicate-Bench: Benchmarking LLMs in Agent-driven Algorithmic Reproduction from Research Papers,'' \textit{arXiv preprint arXiv:2504.00255}, 2024.
+
+\bibitem{lmrbench2025}
+Y. Yan et al., ``LMR-BENCH: Evaluating LLM Agent's Ability on Reproducing Language Modeling Research,'' in \textit{Proc. EMNLP 2025}, pp. 6175--6197, 2025.
+
+\bibitem{xkg2024}
+Y. Luo et al., ``Executable Knowledge Graphs for Replicating AI Research,'' \textit{arXiv preprint arXiv:2510.17795}, 2024.
+
 \bibitem{pineau2020improving}
 J. Pineau et al., ``Improving reproducibility in machine learning research,'' \textit{Journal of Machine Learning Research}, vol. 22, no. 164, pp. 1--20, 2021.
-
-\bibitem{claerbout1992reproducibility}
-J. F. Claerbout and M. Karrenbach, ``Electronic documents give reproducible research a new meaning,'' in \textit{SEG Technical Program Expanded Abstracts}, pp. 601--604, 1992.
 
 \bibitem{gundersen2018state}
 O. E. Gundersen and S. Kjensmo, ``State of the art: Reproducibility in artificial intelligence,'' in \textit{Proc. AAAI Conference on Artificial Intelligence}, vol. 32, no. 1, 2018.

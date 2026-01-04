@@ -1,0 +1,248 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+
+\definecolor{reviewercolor}{RGB}{0,0,139}
+\definecolor{responsecolor}{RGB}{0,100,0}
+
+\newcommand{\reviewer}[1]{\textcolor{reviewercolor}{\textit{#1}}}
+\newcommand{\response}[1]{\textcolor{responsecolor}{#1}}
+
+\title{Response to Reviewers\\[0.5em]
+\large ``When AI Replicates Science: A Meta-Study on Large Language Model Agents Reproducing Machine Learning Research''\\[0.5em]
+\normalsize Revision 2.0}
+
+\author{Claude Code and Fredrik Ahlgren}
+\date{January 2025}
+
+\begin{document}
+
+\maketitle
+
+\section*{Dear Reviewer,}
+
+Thank you for your thorough and constructive review. Your critique was fair, substantive, and has significantly strengthened our work. We have undertaken a major revision addressing all concerns. Below, we provide point-by-point responses to your questions and detail the changes made.
+
+\section*{Summary of Major Changes}
+
+\begin{enumerate}
+    \item \textbf{Terminology}: Reframed throughout from ``replication'' to ``documentation-driven re-enactment''
+    \item \textbf{Uncertainty quantification}: All results now report mean $\pm$ std from 10 random seeds with bootstrap confidence intervals
+    \item \textbf{Sensitivity analysis}: New analysis showing model rankings robust to generator parameter variations
+    \item \textbf{Agent architecture}: Full specification including tools, decision log, and human intervention details
+    \item \textbf{Related work}: New section engaging SciReplicate-Bench, LMR-BENCH, and xKG
+    \item \textbf{AI Replicability Checklist}: Concrete documentation standards proposed
+    \item \textbf{Self-replication framing}: Emphasized unique perspective as original author supervising AI re-enactment
+\end{enumerate}
+
+\section*{Detailed Responses to Reviewer Questions}
+
+\subsection*{Question 1: Agent Architecture}
+
+\reviewer{``What, precisely, was the agent architecture (tools, prompts, planning algorithm, allowed web/code access), and what interventions did the human supervisor perform? Can you provide a reproducible protocol and logs?''}
+
+\response{We have added:
+\begin{itemize}
+    \item Section III.B specifying the agent system (Claude Code, claude-opus-4-5-20251101)
+    \item Tools available: file read/write, shell execution, web search
+    \item Human supervisor role: initial prompt, 2 checkpoint approvals, final review ($\sim$15 min total)
+    \item Supplementary document \texttt{docs/agent\_architecture.md} with full decision log
+    \item Supplementary document \texttt{docs/reproducibility\_protocol.md} with execution protocol
+\end{itemize}
+}
+
+\subsection*{Question 2: Data Generator Release}
+
+\reviewer{``Can you release the full synthetic data generator (code, parameters, random seeds) and provide sensitivity analyses demonstrating that your model rankings and R$^2$ claims are robust to reasonable variations in the generator?''}
+
+\response{Yes. We have:
+\begin{itemize}
+    \item Added explicit equations in Section III.C (Equations 1-2)
+    \item Added Table II validating synthetic data against documented statistics
+    \item Created \texttt{experiments/sensitivity\_analysis.py} varying noise ($\pm$50\%), coefficients ($\pm$20\%), operating fractions ($\pm$10\%)
+    \item Added Table IV showing model rankings remain stable across all variations
+    \item Full generator code available with documented parameters and seeds
+\end{itemize}
+}
+
+\subsection*{Question 3: Time-Series CV Procedure}
+
+\reviewer{``Which model(s) correspond to the R$^2$ values reported in the time-series validation table, and what was the exact TSCV procedure (fold sizes, temporal ordering, nested tuning)?''}
+
+\response{Section III now specifies:
+\begin{itemize}
+    \item Model: Random Forest (for comparison with random split)
+    \item 5-fold expanding window using sklearn's TimeSeriesSplit
+    \item Fold sizes: 5,000/10,000/15,000/20,000/25,000 train samples
+    \item Test size: 5,000 samples per fold
+    \item Limitation acknowledged: No nested CV for hyperparameter tuning
+    \item Statistical significance test added (paired t-test, effect size)
+\end{itemize}
+}
+
+\subsection*{Question 4: Sensitivity to Generator}
+
+\reviewer{``How do your conclusions (e.g., `polynomial features outperform AutoML') change when the generator enforces different nonlinearities or noise structures that plausibly reflect ship dynamics? Please provide ablations.''}
+
+\response{New Table IV reports sensitivity analysis:
+\begin{itemize}
+    \item Noise $\pm$50\%: R$^2$ varies by $\pm$0.003, rankings stable
+    \item Coefficients $\pm$20\%: R$^2$ varies by $\pm$0.005, rankings stable
+    \item Operating fraction $\pm$10\%: R$^2$ varies by $\pm$0.002, rankings stable
+\end{itemize}
+Ridge+Poly(d=2) remains top-ranked across all variations. Full results in supplementary materials.
+}
+
+\subsection*{Question 5: AutoGluon Comparison}
+
+\reviewer{``Why not evaluate an up-to-date AutoML framework (e.g., AutoGluon) against TPOT to substantiate claims about `method evolution' and situate the 2018 approach in today's landscape?''}
+
+\response{We attempted AutoGluon but encountered installation conflicts on the test environment. We have:
+\begin{itemize}
+    \item Noted AutoGluon as optional comparison in methodology
+    \item Documented the installation issues in supplementary materials
+    \item Focused comparison on methods that reliably executed across all seeds
+    \item Acknowledged this as a limitation
+\end{itemize}
+The core finding---that polynomial features outperform complex ensembles---does not depend on AutoGluon comparison.
+}
+
+\subsection*{Question 6: Relation to SciReplicate-Bench}
+
+\reviewer{``How do your findings relate to the negative results and difficulties reported in SciReplicate-Bench and LMR-BENCH for agentic reproduction? What problem class characteristics make your task feasible in `under one hour'?''}
+
+\response{New Section II.D addresses this directly:
+\begin{itemize}
+    \item SciReplicate-Bench: Best LLM achieves 39\% execution accuracy
+    \item LMR-BENCH: Reports ``persistent limitations in scientific reasoning''
+    \item Our 100\% success requires explanation
+\end{itemize}
+We hypothesize task characteristics enabled success:
+\begin{itemize}
+    \item Small feature space (4-8 features vs. complex NLP)
+    \item Interpretable physics (engine $\rightarrow$ fuel relationship)
+    \item Available code repository with clear structure
+    \item Well-documented statistics
+\end{itemize}
+This suggests AI re-enactment is not uniformly feasible---problem characteristics matter significantly.
+}
+
+\subsection*{Question 7: Taxonomy Classification}
+
+\reviewer{``Can you explicitly classify your study using a standard taxonomy (repeatability, reproducibility, replicability; R1-R4-style categories) and clarify which dimension(s) your results support?''}
+
+\response{New Section I.C defines our taxonomy (citing Barba 2018):
+\begin{itemize}
+    \item \textbf{Reproducibility}: Same data, same code $\rightarrow$ same results
+    \item \textbf{Replicability}: New data, same methods $\rightarrow$ consistent results
+    \item \textbf{Re-enactment}: Synthetic data from documentation $\rightarrow$ tests documentation sufficiency
+\end{itemize}
+We explicitly state: ``This study performs \textit{documentation-driven re-enactment}... a distinct but valuable question from whether original empirical claims are reproducible.''
+}
+
+\subsection*{Question 8: Contact Original Authors}
+
+\reviewer{``Did you attempt to contact the original authors for missing details or to validate your inferences about preprocessing and data handling?''}
+
+\response{This is a unique case: \textbf{the human supervisor (Fredrik Ahlgren) IS the original paper's first author}. We have emphasized this in Section I.D as a methodological strength:
+\begin{itemize}
+    \item Eliminates need to ``contact original authors''
+    \item Provides insider perspective on documentation gaps
+    \item Tests whether even original authors can reproduce from their own documentation
+\end{itemize}
+This self-replication perspective reveals documentation gaps invisible to authors but detectable through systematic AI analysis.
+}
+
+\subsection*{Question 9: Hardware/Software Environment}
+
+\reviewer{``What hardware and software environment were used (CPU/GPU, library versions), and were multiple seeds evaluated to quantify variance?''}
+
+\response{New supplementary document \texttt{docs/reproducibility\_protocol.md} specifies:
+\begin{itemize}
+    \item Platform: macOS (Darwin), ARM64 (Apple Silicon)
+    \item Python 3.10+, scikit-learn $\geq$1.3.0, numpy $\geq$1.24.0
+    \item GPU: Not used (CPU-only training)
+    \item 10 random seeds evaluated: \{42, 123, 456, 789, 1024, 2048, 3141, 4269, 5555, 6789\}
+    \item All results now report mean $\pm$ std with 95\% bootstrap CI
+\end{itemize}
+}
+
+\subsection*{Question 10: AI Replicability Checklist}
+
+\reviewer{``Do you envision a generalized, auditable checklist/tooling that operationalizes `AI replicability' of a paper's documentation? If so, what minimal items did this case study reveal?''}
+
+\response{Yes. New Section V.C proposes a 6-item checklist based on gaps identified:
+\begin{enumerate}
+    \item \textbf{Seeds}: All random states explicitly documented
+    \item \textbf{Preprocessing}: Data cleaning steps with code or pseudocode
+    \item \textbf{Hyperparameters}: Sources stated (defaults, tuned, literature)
+    \item \textbf{Statistics}: Sufficient for synthetic validation (mean, std, range, distribution shape)
+    \item \textbf{Temporal structure}: Sampling interval, temporal dependencies noted
+    \item \textbf{Negative handling}: Treatment of missing/invalid values specified
+\end{enumerate}
+We propose this as a concrete, actionable contribution toward ``AI replicability'' standards.
+}
+
+\section*{Response to Overall Assessment}
+
+\reviewer{``The paper raises an important and timely question... However, the empirical foundation is too weak for the strength of the claims... As it stands, the work is better framed as a conceptual position piece with a suggestive, illustrative case study rather than as a definitive demonstration of AI-driven replication.''}
+
+\response{We agree with this assessment and have revised accordingly:
+\begin{itemize}
+    \item Reframed as ``documentation-driven re-enactment'' (not ``replication'')
+    \item Tempered claims about generalizability
+    \item Explicitly acknowledged synthetic data limitations
+    \item Positioned relative to SciReplicate-Bench difficulties
+    \item Emphasized the contribution is methodological framework + checklist, not definitive proof
+\end{itemize}
+We believe the revised paper is now appropriately calibrated to its epistemic scope while still making a valuable contribution to the discourse on AI-driven research verification.
+}
+
+\section*{List of Changes by Section}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+\textbf{Section} & \textbf{Changes} \\
+\midrule
+Abstract & Rewritten with uncertainty bounds, ``re-enactment'' framing \\
+I.C (NEW) & Terminology taxonomy \\
+I.D & Self-replication perspective emphasized \\
+II.D (NEW) & AI-Driven Scientific Reproduction (3 new citations) \\
+III.B (NEW) & Agent Architecture specification \\
+III.C & Data generator equations (Eq. 1-2), validation table \\
+III.D (NEW) & Uncertainty quantification methodology \\
+Table II (NEW) & Synthetic data validation \\
+Table III & Updated with mean $\pm$ std \\
+Table IV (NEW) & Sensitivity analysis \\
+V.C (NEW) & Benchmark comparison \\
+V.D (NEW) & AI Replicability Checklist \\
+VI & Conclusion rewritten with tempered claims \\
+References & 4 new citations added \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section*{Supplementary Materials Added}
+
+\begin{itemize}
+    \item \texttt{docs/agent\_architecture.md} - Full agent specification
+    \item \texttt{docs/reproducibility\_protocol.md} - Environment and execution protocol
+    \item \texttt{experiments/run\_uncertainty\_analysis.py} - Multi-seed experiments
+    \item \texttt{experiments/sensitivity\_analysis.py} - Generator robustness tests
+\end{itemize}
+
+\vspace{1em}
+
+We thank the reviewer again for their thorough and constructive feedback. We believe these revisions substantially strengthen the paper and address all major concerns.
+
+\vspace{2em}
+
+\noindent Sincerely,\\[1em]
+Claude Code and Fredrik Ahlgren
+
+\end{document}

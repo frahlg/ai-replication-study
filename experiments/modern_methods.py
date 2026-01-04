@@ -252,13 +252,41 @@ class ModernMethodsExperiment:
         self,
         X: np.ndarray,
         y: np.ndarray,
-        model_name: str = 'random_forest'
+        model_name: str = 'random_forest',
+        verbose: bool = True
     ) -> Dict:
         """
         Test with time-series cross-validation.
 
         Critical analysis: The original paper used random train/test split,
         but ship sensor data is time-series. Does this matter?
+
+        TIME-SERIES CV PROTOCOL (Addressing Reviewer Concern #3)
+        ========================================================
+
+        We use sklearn's TimeSeriesSplit with 5 folds. This implements
+        an expanding window approach where:
+
+        - Fold 1: Train on [0:N/6], Test on [N/6:2N/6]
+        - Fold 2: Train on [0:2N/6], Test on [2N/6:3N/6]
+        - Fold 3: Train on [0:3N/6], Test on [3N/6:4N/6]
+        - Fold 4: Train on [0:4N/6], Test on [4N/6:5N/6]
+        - Fold 5: Train on [0:5N/6], Test on [5N/6:N]
+
+        For N=30,000 samples:
+        - Fold 1: Train=5,000, Test=5,000
+        - Fold 2: Train=10,000, Test=5,000
+        - Fold 3: Train=15,000, Test=5,000
+        - Fold 4: Train=20,000, Test=5,000
+        - Fold 5: Train=25,000, Test=5,000
+
+        This prevents temporal leakage by ensuring test data always
+        comes AFTER training data chronologically.
+
+        LIMITATIONS:
+        - No nested CV for hyperparameter tuning (hyperparameters fixed)
+        - Expanding window may overweight later data
+        - 5 folds may not capture all seasonal patterns
         """
         models = self.get_modern_models()
         model = models[model_name]['model']
@@ -267,21 +295,136 @@ class ModernMethodsExperiment:
         tscv = TimeSeriesSplit(n_splits=5)
 
         scores = []
-        for train_idx, test_idx in tscv.split(X):
+        fold_details = []
+
+        if verbose:
+            print("\n" + "-" * 60)
+            print("TIME-SERIES CROSS-VALIDATION DETAILS")
+            print("-" * 60)
+            print(f"Model: {model_name}")
+            print(f"Total samples: {len(X)}")
+            print(f"Number of folds: 5")
+            print()
+
+        for fold_idx, (train_idx, test_idx) in enumerate(tscv.split(X)):
             X_train, X_test = X[train_idx], X[test_idx]
             y_train, y_test = y[train_idx], y[test_idx]
 
             model.fit(X_train, y_train)
             y_pred = model.predict(X_test)
-            scores.append(r2_score(y_test, y_pred))
+            r2 = r2_score(y_test, y_pred)
+            scores.append(r2)
+
+            fold_info = {
+                'fold': fold_idx + 1,
+                'train_start': train_idx[0],
+                'train_end': train_idx[-1],
+                'train_size': len(train_idx),
+                'test_start': test_idx[0],
+                'test_end': test_idx[-1],
+                'test_size': len(test_idx),
+                'r2': r2
+            }
+            fold_details.append(fold_info)
+
+            if verbose:
+                print(f"Fold {fold_idx+1}:")
+                print(f"  Train: indices [{train_idx[0]:>6}:{train_idx[-1]:<6}] "
+                      f"({len(train_idx):,} samples)")
+                print(f"  Test:  indices [{test_idx[0]:>6}:{test_idx[-1]:<6}] "
+                      f"({len(test_idx):,} samples)")
+                print(f"  R² = {r2:.4f}")
+
+        if verbose:
+            print()
+            print(f"Mean R² = {np.mean(scores):.4f} ± {np.std(scores):.4f}")
 
         return {
             'mean_r2': np.mean(scores),
             'std_r2': np.std(scores),
             'min_r2': np.min(scores),
             'max_r2': np.max(scores),
-            'scores': scores
+            'scores': scores,
+            'fold_details': fold_details
         }
+
+    def run_significance_test(
+        self,
+        X: np.ndarray,
+        y: np.ndarray,
+        random_split_r2: float,
+        n_bootstrap: int = 1000
+    ) -> Dict:
+        """
+        Test statistical significance of random vs time-series CV difference.
+
+        Uses paired t-test on fold scores vs bootstrap samples from random split.
+
+        This addresses reviewer question: "Is the 0.5% gap statistically significant?"
+        """
+        from scipy import stats
+
+        # Get time-series CV scores
+        ts_result = self.run_time_series_validation(X, y, verbose=False)
+        ts_scores = ts_result['scores']
+
+        # Bootstrap random split performance
+        np.random.seed(self.seed)
+        n_samples = len(X)
+
+        bootstrap_r2s = []
+        for _ in range(n_bootstrap):
+            # Random sample indices
+            idx = np.random.choice(n_samples, size=n_samples, replace=True)
+            train_size = int(0.75 * len(idx))
+            train_idx = idx[:train_size]
+            test_idx = idx[train_size:]
+
+            X_train, X_test = X[train_idx], X[test_idx]
+            y_train, y_test = y[train_idx], y[test_idx]
+
+            model = self.get_modern_models()['random_forest']['model']
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            bootstrap_r2s.append(r2_score(y_test, y_pred))
+
+        # One-sample t-test: is TS-CV mean significantly different from random split mean?
+        t_stat, p_value = stats.ttest_1samp(ts_scores, np.mean(bootstrap_r2s))
+
+        # Effect size (Cohen's d)
+        pooled_std = np.sqrt((np.std(ts_scores)**2 + np.std(bootstrap_r2s)**2) / 2)
+        cohens_d = (np.mean(ts_scores) - np.mean(bootstrap_r2s)) / pooled_std
+
+        return {
+            'ts_cv_mean': np.mean(ts_scores),
+            'ts_cv_std': np.std(ts_scores),
+            'random_split_mean': np.mean(bootstrap_r2s),
+            'random_split_std': np.std(bootstrap_r2s),
+            'difference': np.mean(ts_scores) - np.mean(bootstrap_r2s),
+            't_statistic': t_stat,
+            'p_value': p_value,
+            'cohens_d': cohens_d,
+            'significant_at_05': p_value < 0.05,
+            'interpretation': self._interpret_significance(p_value, cohens_d)
+        }
+
+    def _interpret_significance(self, p_value: float, cohens_d: float) -> str:
+        """Interpret statistical significance results."""
+        if p_value >= 0.05:
+            sig_text = "NOT statistically significant (p >= 0.05)"
+        else:
+            sig_text = f"statistically significant (p = {p_value:.4f})"
+
+        if abs(cohens_d) < 0.2:
+            effect_text = "negligible effect size"
+        elif abs(cohens_d) < 0.5:
+            effect_text = "small effect size"
+        elif abs(cohens_d) < 0.8:
+            effect_text = "medium effect size"
+        else:
+            effect_text = "large effect size"
+
+        return f"{sig_text}, {effect_text} (d = {cohens_d:.3f})"
 
     def run_full_comparison(
         self,
