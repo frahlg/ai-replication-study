@@ -1,0 +1,251 @@
+[
+  {
+    "timestamp": "2026-01-04T13:18:45.329577",
+    "event": "Experiment initialized",
+    "data": {
+      "seed": 42,
+      "timestamp": "2026-01-04T13:18:45.329575",
+      "original_paper_baseline_r2": 0.992
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:18:57.703319",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm",
+      "best_r2": 0.9876634582763106,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:19:10.745597",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "frp",
+      "best_r2": 0.9853559310925678,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:19:23.857313",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "exh_t",
+      "best_r2": 0.8300603460315372,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:19:36.961110",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "tc_rpm",
+      "best_r2": 0.924523282436793,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:19:59.894779",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+frp",
+      "best_r2": 0.9927324340423643,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:20:24.672877",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+exh_t",
+      "best_r2": 0.9865178038027064,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:20:47.216373",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+tc_rpm",
+      "best_r2": 0.9875242951845649,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:21:11.785455",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "frp+exh_t",
+      "best_r2": 0.9858494370548825,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:21:35.922725",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "frp+tc_rpm",
+      "best_r2": 0.9899049697064087,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:21:59.694917",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "exh_t+tc_rpm",
+      "best_r2": 0.9434924808780695,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:22:31.427303",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+frp+exh_t",
+      "best_r2": 0.9918192747335699,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:23:02.808680",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+frp+tc_rpm",
+      "best_r2": 0.9925440231550152,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:23:34.799802",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+exh_t+tc_rpm",
+      "best_r2": 0.9869152576471422,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:24:09.020202",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "frp+exh_t+tc_rpm",
+      "best_r2": 0.9896209683714238,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-04T13:24:50.149885",
+    "event": "Baseline models completed",
+    "data": {
+      "feature_combination": "rpm+frp+exh_t+tc_rpm",
+      "best_r2": 0.992110081141992,
+      "models_tested": [
+        "linear",
+        "ridge",
+        "random_forest",
+        "gradient_boosting",
+        "extra_trees",
+        "stacking_ensemble"
+      ]
+    }
+  }
+]
